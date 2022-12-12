@@ -42,6 +42,7 @@ const shirtDesignsChangeHandler = (event, shirtColorsInput) => {
 };
 
 const activitiesFieldsetChangeHandler = (event, cost) => {
+  console.log('changes: ', event.target);
   const costContent = cost.textContent;
 
   let costAsNumber = Number(
@@ -63,6 +64,18 @@ const activitiesFieldsetChangeHandler = (event, cost) => {
   }
 
   cost.textContent = `Total: $${costAsNumber}`;
+};
+
+const activitiesFieldsetFocusHandler = (event) => {
+  if (event.target.type === 'checkbox') {
+    event.target.parentNode.classList.add('focus');
+  }
+};
+
+const activitiesFieldsetBlurHandler = (event) => {
+  if (event.target.type === 'checkbox') {
+    event.target.parentNode.classList.remove('focus');
+  }
 };
 
 const paymentFieldsetChangeHandler = (
@@ -110,7 +123,7 @@ const activitiesValidator = (activities) => {
   return false;
 };
 
-const creditCardValidator = (creditCard) => {
+const creditCardValidator = () => {
   const creditCardValue = document.getElementById('cc-num').value;
   const zipCodeValue = document.getElementById('zip').value;
   const cvvValue = document.getElementById('cvv').value;
@@ -169,6 +182,18 @@ const main = () => {
     activitiesFieldsetChangeHandler(event, activitiesCost)
   );
 
+  activitiesFieldset.addEventListener(
+    'focus',
+    (event) => activitiesFieldsetFocusHandler(event),
+    true
+  );
+
+  activitiesFieldset.addEventListener(
+    'blur',
+    (event) => activitiesFieldsetBlurHandler(event),
+    true
+  );
+
   paymentMethodsFieldSet.addEventListener('change', (event) =>
     paymentFieldsetChangeHandler(event, paypalBox, bitcoinBox, creditCardBox)
   );
@@ -182,7 +207,7 @@ const main = () => {
 
     const isEmailValid = emailValidator(emailInputValue);
     const isOneActivityChecked = activitiesValidator(activitiesBox.children);
-    
+
     if (paymentMethodValue === 'credit-card') {
       const isCreditCardValid = creditCardValidator(creditCardBox);
     }
