@@ -1,13 +1,184 @@
+/**
+ * focus name input when page loads
+ * @param element {HTMLElement}
+ */
 const focusNameInput = (element) => {
   element.focus();
 };
 
+/**
+ * check if email input is a "valid" e-mail
+ * @param email
+ * @returns {boolean}
+ */
+const emailValidator = (email) => {
+  const mailRegExp = /\S+@\S+\.\S+/;
+  return mailRegExp.test(email);
+};
+
+/**
+ * check if one of the activities is checked
+ * @param activities - all activities elements
+ * @returns {boolean}
+ */
+const activitiesValidator = (activities) => {
+  for (let i = 0; i < activities.length; i++) {
+    if (activities[i].children[0].checked) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+/**
+ * check if credit card values are valid - cc-num, zip and cvv
+ * @returns {{cvvValid: boolean, creditCardValid: boolean, zipCodeValid: boolean}}
+ */
+const creditCardValidator = () => {
+  const creditCardValue = document.getElementById('cc-num').value;
+  const zipCodeValue = document.getElementById('zip').value;
+  const cvvValue = document.getElementById('cvv').value;
+
+  const creditCardValid =
+    creditCardValue.length > 13 &&
+    creditCardValue.length < 16 &&
+    creditCardValue !== '';
+
+  const zipCodeValid = zipCodeValue.length === 5;
+  const cvvValid = cvvValue.length === 3;
+
+  return { creditCardValid, zipCodeValid, cvvValid };
+};
+
+/**
+ *
+ * @param emailValid {boolean}
+ * @param infoBox -
+ * @param emailInput - email INPUT DOM Element
+ */
+const emailErrorSetter = (emailValid, infoBox, emailInput) => {
+  if (!emailValid) {
+    emailInput.parentElement.classList.add('not-valid');
+    emailInput.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    emailInput.parentElement.classList.remove('not-valid');
+    emailInput.nextElementSibling.style.setProperty('display', 'none');
+  }
+};
+
+/**
+ * function sets not valid values onto the input element and error box messages
+ * @param ccValid {boolean}
+ * @param ccInput {HTMLInputElement}
+ */
+const ccErrorSetter = (ccValid, ccInput) => {
+  const numberRegex = /^\d*$/;
+  const inputValue = ccInput.value;
+
+  if (!ccValid) {
+    ccInput.parentElement.classList.add('not-valid');
+    ccInput.classList.add('not-valid');
+    ccInput.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    ccInput.parentElement.classList.remove('not-valid');
+    ccInput.classList.remove('not-valid');
+    ccInput.nextElementSibling.style.setProperty('display', 'none');
+  }
+
+  if (!numberRegex.test(inputValue)) {
+    ccInput.nextElementSibling.textContent =
+      'Credit card number can only contain numbers...';
+  } else {
+    ccInput.nextElementSibling.textContent =
+      'Credit card number must be between 13 - 16 digits';
+  }
+};
+
+/**
+ * function sets not valid values onto the input element and error box messages
+ * @param zipValid {boolean}
+ * @param zipInput {HTMLElement}
+ */
+const zipErrorSetter = (zipValid, zipInput) => {
+  if (!zipValid) {
+    zipInput.parentElement.classList.add('not-valid');
+    zipInput.classList.add('not-valid');
+    zipInput.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    zipInput.parentElement.classList.remove('not-valid');
+    zipInput.classList.remove('not-valid');
+    zipInput.nextElementSibling.style.setProperty('display', 'none');
+  }
+};
+
+/**
+ * function sets not valid values onto the input element and error box messages
+ * @param cvvValid {boolean}
+ * @param cvvInput {HTMLInputElement}
+ */
+const cvvErrorSetter = (cvvValid, cvvInput) => {
+  if (!cvvValid) {
+    cvvInput.parentElement.classList.add('not-valid');
+    cvvInput.classList.add('not-valid');
+    cvvInput.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    cvvInput.parentElement.classList.remove('not-valid');
+    cvvInput.classList.remove('not-valid');
+    cvvInput.nextElementSibling.style.setProperty('display', 'none');
+  }
+};
+
+/**
+ * function sets not valid values onto the input element and error box messages
+ * @param nameValid {boolean}
+ * @param nameInput {HTMLInputElement}
+ */
+const nameErrorSetter = (nameValid, nameInput) => {
+  if (!nameValid) {
+    nameInput.parentElement.classList.add('not-valid');
+    nameInput.classList.add('not-valid');
+    nameInput.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    nameInput.parentElement.classList.remove('not-valid');
+    nameInput.classList.remove('not-valid');
+    nameInput.nextElementSibling.style.setProperty('display', 'none');
+  }
+};
+
+/**
+ * function sets not valid values onto the input element and error box messages
+ * @param activitiesValid {boolean}
+ * @param activitiesFieldSet {HTMLInputElement}
+ */
+const activitiesErrorSetter = (activitiesValid, activitiesFieldSet) => {
+  if (!activitiesValid) {
+    activitiesFieldSet.parentElement.classList.add('not-valid');
+    activitiesFieldSet.classList.add('not-valid');
+    activitiesFieldSet.nextElementSibling.style.setProperty('display', 'block');
+  } else {
+    activitiesFieldSet.parentElement.classList.remove('not-valid');
+    activitiesFieldSet.classList.remove('not-valid');
+    activitiesFieldSet.nextElementSibling.style.setProperty('display', 'none');
+  }
+};
+
+/**
+ * hide other job input field
+ * @param element {HTMLElement}
+ * @param hideInput {boolean}
+ */
 const toggleOtherJobRoleInput = (element, hideInput) => {
   !!hideInput
-    ? (element.style = 'visibility: hidden')
+    ? (element.style.visibility = 'hidden')
     : element.removeAttribute('style');
 };
 
+/**
+ * hide/show other job input element based on dropdown selection
+ * @param event {Event}
+ * @param otherJobRoleInput {HTMLInputElement}
+ */
 const jobTitleChangeHandler = (event, otherJobRoleInput) => {
   const jobTitleSelectionValue = event.target.value;
 
@@ -16,13 +187,23 @@ const jobTitleChangeHandler = (event, otherJobRoleInput) => {
     : toggleOtherJobRoleInput(otherJobRoleInput, true);
 };
 
+/**
+ * enable/disable color selection based on design selection
+ * @param element {HTMLElement}
+ * @param disableInput {boolean}
+ */
 const toggleShirtColorsInput = (element, disableInput) => {
   console.log(disableInput);
   !!disableInput
     ? element.setAttribute('disabled', 'true')
-    : element.removeAttribute('disabled', null);
+    : element.removeAttribute('disabled');
 };
 
+/**
+ *
+ * @param event {Event}
+ * @param shirtColorsInput {HTMLSelectElement}
+ */
 const shirtDesignsChangeHandler = (event, shirtColorsInput) => {
   const designSelectValue = event.target.value;
 
@@ -32,7 +213,7 @@ const shirtDesignsChangeHandler = (event, shirtColorsInput) => {
       shirtColorsInput.options[i].getAttribute('data-theme') !==
       designSelectValue
     ) {
-      shirtColorsInput.options[i].setAttribute('hidden', true);
+      shirtColorsInput.options[i].setAttribute('hidden', 'true');
     }
   }
 
@@ -41,6 +222,11 @@ const shirtDesignsChangeHandler = (event, shirtColorsInput) => {
   }
 };
 
+/**
+ * event handler for activities fieldset
+ * @param event {Event}
+ * @param cost {HTMLElement}
+ */
 const activitiesFieldsetChangeHandler = (event, cost) => {
   const activitiesElements = event.target.parentElement.parentElement.children;
   const costContent = cost.textContent;
@@ -87,92 +273,91 @@ const activitiesFieldsetChangeHandler = (event, cost) => {
   cost.textContent = `Total: $${costAsNumber}`;
 };
 
+/**
+ * adding focus class when focus event triggered
+ * @param event {Event}
+ */
 const activitiesFieldsetFocusHandler = (event) => {
   if (event.target.type === 'checkbox') {
     event.target.parentNode.classList.add('focus');
   }
 };
 
+/**
+ * remove focus class when blur event triggered
+ * @param event {Event}
+ */
 const activitiesFieldsetBlurHandler = (event) => {
   if (event.target.type === 'checkbox') {
     event.target.parentNode.classList.remove('focus');
   }
 };
 
+/**
+ * change handler to disable inputs on the same date/time schedule
+ * @param event {Event}
+ * @param paypalBox {HTMLElement}
+ * @param bitcoinBox {HTMLElement}
+ * @param creditCardBox {HTMLElement}
+ * @param expirationBox {HTMLElement}
+ */
 const paymentFieldsetChangeHandler = (
   event,
   paypalBox,
   bitcoinBox,
-  creditCardBox
+  creditCardBox,
+  expirationBox
 ) => {
   const eventTargetName = event.target.name;
   const eventTargetValue = event.target.value;
 
   if (eventTargetName === 'user-payment') {
     if (eventTargetValue === 'credit-card') {
-      paypalBox.style = 'display: none';
-      bitcoinBox.style = 'display: none';
+      paypalBox.style.display = 'none';
+      bitcoinBox.style.display = 'none';
       creditCardBox.removeAttribute('style');
+      expirationBox.removeAttribute('style');
     }
 
     if (eventTargetValue === 'paypal') {
-      creditCardBox.style = 'display: none';
-      bitcoinBox.style = 'display: none';
+      creditCardBox.style.display = 'none';
+      bitcoinBox.style.display = 'none';
+      expirationBox.style.display = 'none';
       paypalBox.removeAttribute('style');
     }
 
     if (eventTargetValue === 'bitcoin') {
-      paypalBox.style = 'display: none';
-      creditCardBox.style = 'display: none';
+      paypalBox.style.display = 'none';
+      creditCardBox.style.display = 'none';
+      expirationBox.style.display = 'none';
       bitcoinBox.removeAttribute('style');
     }
   }
 };
 
-const emailValidator = (email) => {
-  const mailRegExp = /\S+@\S+\.\S+/;
-  return mailRegExp.test(email);
-};
-
-const activitiesValidator = (activities) => {
-  for (let i = 0; i < activities.length; i++) {
-    if (activities[i].children[0].checked) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-const creditCardValidator = () => {
-  const creditCardValue = document.getElementById('cc-num').value;
-  const zipCodeValue = document.getElementById('zip').value;
-  const cvvValue = document.getElementById('cvv').value;
-
-  const creditCardValid =
-    creditCardValue.length > 13 &&
-    creditCardValue.length < 16 &&
-    creditCardValue !== '';
-
-  const zipCodeValid = zipCodeValue.length === 5;
-  const cvvValid = cvvValue.length === 3;
-
-  return { creditCardValid, zipCodeValid, cvvValid };
-};
-
+/**
+ * Main Start Function
+ */
 const main = () => {
   const nameInput = document.getElementById('name');
   focusNameInput(nameInput);
 
+  const emailInput = document.getElementById('email');
   const jobRoleInput = document.getElementById('title');
+  const basicInfoBox = document.querySelector('.basic-info');
   const otherJobRoleInput = document.getElementById('other-job-role');
-  toggleOtherJobRoleInput(otherJobRoleInput, true);
-
+  const creditCardBox = document.querySelector('.credit-card-box');
+  const expirationBox = document.querySelector('.expiration-box');
+  const activitiesBox = document.getElementById('activities-box');
+  const activitiesFieldset = document.getElementById('activities');
   const shirtDesignsInput = document.getElementById('shirt-designs');
   const shirtColorsInput = document.getElementById('color');
+  const formContainer = document.querySelector('form');
+  const paymentMethod = document.querySelector('#payment');
+
+  toggleOtherJobRoleInput(otherJobRoleInput, true);
   toggleShirtColorsInput(shirtColorsInput, true);
 
-  const activitiesFieldset = document.getElementById('activities');
   const activitiesCost =
     activitiesFieldset.children.namedItem('activities-cost');
 
@@ -180,15 +365,11 @@ const main = () => {
   const paypalBox = paymentMethodsFieldSet.children.namedItem('paypal');
   const bitcoinBox = paymentMethodsFieldSet.children.namedItem('bitcoin');
   const paymentMethodBox = paymentMethodsFieldSet.children[1];
-  const creditCardBox =
-    paymentMethodsFieldSet.children.namedItem('credit-card');
 
   paymentMethodBox.children[1].children[1].selected = true;
 
   paypalBox.style = 'display: none';
   bitcoinBox.style = 'display: none';
-
-  const formContainer = document.querySelector('form');
 
   // EVENT LISTENERS
   jobRoleInput.addEventListener('change', (event) =>
@@ -220,119 +401,57 @@ const main = () => {
   );
 
   paymentMethodsFieldSet.addEventListener('change', (event) =>
-    paymentFieldsetChangeHandler(event, paypalBox, bitcoinBox, creditCardBox)
+    paymentFieldsetChangeHandler(
+      event,
+      paypalBox,
+      bitcoinBox,
+      creditCardBox,
+      expirationBox
+    )
   );
 
+  emailInput.addEventListener('keyup', (event) => {
+    const isEmailValid = emailValidator(event.target.value);
+    emailErrorSetter(isEmailValid, basicInfoBox, emailInput);
+  });
+
+  creditCardBox.addEventListener('keyup', (event) => {
+    const { creditCardValid } = creditCardValidator();
+
+    ccErrorSetter(creditCardValid, event.target);
+  });
+
   formContainer.addEventListener('submit', (event) => {
-    console.log('SUBMITTING');
-    console.log('event.target: ', event.target);
-
-    const nameInput = document.querySelector('#name');
     const nameInputValue = nameInput.value;
+    const nameInputError = nameInputValue !== '';
 
-    if (nameInputValue === '') {
-      nameInput.nextElementSibling.style.setProperty('display', 'block');
-    } else {
-      nameInput.nextElementSibling.style.setProperty('display', 'none');
-    }
+    nameErrorSetter(nameInputError, nameInput);
 
-    const emailInput = document.getElementById('email');
-
-    const activitiesBox = document.getElementById('activities-box');
-    const creditCardBox = document.querySelector('.credit-card-box');
-    const basicInfoBox = document.querySelector('.basic-info');
-
-    const paymentMethodValue = document.querySelector('#payment').value;
+    const paymentMethodValue = paymentMethod.value;
 
     const isEmailValid = emailValidator(emailInput.value);
-
-    if (!isEmailValid) {
-      basicInfoBox.classList.add('not-valid');
-      emailInput.nextElementSibling.style.setProperty('display', 'block');
-    } else {
-      basicInfoBox.classList.remove('not-valid');
-      emailInput.nextElementSibling.style.setProperty('display', 'none');
-    }
+    emailErrorSetter(isEmailValid, basicInfoBox, emailInput);
 
     const isOneActivityChecked = activitiesValidator(activitiesBox.children);
-
-    //el.style.setProperty
-    if (!isOneActivityChecked) {
-      activitiesFieldset.classList.add('not-valid');
-      activitiesFieldset.lastElementChild.style.setProperty('display', 'block');
-    } else {
-      activitiesFieldset.classList.remove('not-valid');
-      activitiesFieldset.classList.add('valid');
-      activitiesFieldset.lastElementChild.style.setProperty('display', 'none');
-    }
+    activitiesErrorSetter(isOneActivityChecked, activitiesFieldset);
 
     if (paymentMethodValue === 'credit-card') {
-      const isCreditCardValid = creditCardValidator(creditCardBox);
-
-      console.log('isCreditCardValid: ', isCreditCardValid);
+      const { creditCardValid, cvvValid, zipCodeValid } = creditCardValidator();
 
       const zipInputElement = document.querySelector('#zip');
       const creditCardInputElement = document.querySelector('#cc-num');
       const cvvInputElement = document.querySelector('#cvv');
 
-      if (
-        !isCreditCardValid.cvvValid ||
-        !isCreditCardValid.creditCardValid ||
-        !isCreditCardValid.zipCodeValid
-      ) {
-        creditCardBox.classList.add('not-valid');
+      ccErrorSetter(creditCardValid, creditCardInputElement);
+      zipErrorSetter(zipCodeValid, zipInputElement);
+      cvvErrorSetter(cvvValid, cvvInputElement);
 
-        if (!isCreditCardValid.zipCodeValid) {
-          zipInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'block'
-          );
-        } else {
-          zipInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'none'
-          );
-        }
-
-        if (!isCreditCardValid.cvvValid) {
-          cvvInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'block'
-          );
-        } else {
-          cvvInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'none'
-          );
-        }
-
-        if (!isCreditCardValid.creditCardValid) {
-          creditCardInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'block'
-          );
-        } else {
-          creditCardInputElement.nextElementSibling.style.setProperty(
-            'display',
-            'none'
-          );
-        }
-      } else {
-        creditCardBox.classList.remove('not-valid');
-        creditCardBox.classList.add('valid');
-
-        cvvInputElement.nextElementSibling.style.setProperty('display', 'none');
-
-        creditCardInputElement.nextElementSibling.style.setProperty(
-          'display',
-          'none'
-        );
-
-        zipInputElement.nextElementSibling.style.setProperty('display', 'none');
-      }
+      event.preventDefault();
     }
 
-    event.preventDefault();
+    if (nameInputError || isEmailValid || isOneActivityChecked) {
+      event.preventDefault();
+    }
   });
 };
 
