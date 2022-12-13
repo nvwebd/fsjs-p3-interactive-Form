@@ -41,12 +41,12 @@ const creditCardValidator = () => {
   const cvvValue = document.getElementById('cvv').value;
 
   const creditCardValid =
-    creditCardValue.length > 13 &&
-    creditCardValue.length < 16 &&
-    creditCardValue !== '';
+    creditCardValue.length >= 13 &&
+    creditCardValue.length <= 16 &&
+    /^\d+$/.test(creditCardValue);
 
-  const zipCodeValid = zipCodeValue.length === 5;
-  const cvvValid = cvvValue.length === 3;
+  const zipCodeValid = zipCodeValue.length === 5 && /^\d+$/.test(zipCodeValue);
+  const cvvValid = cvvValue.length === 3 && /^\d+$/.test(cvvValue);
 
   return { creditCardValid, zipCodeValid, cvvValid };
 };
@@ -54,15 +54,26 @@ const creditCardValidator = () => {
 /**
  *
  * @param emailValid {boolean}
- * @param infoBox -
  * @param emailInput - email INPUT DOM Element
  */
-const emailErrorSetter = (emailValid, infoBox, emailInput) => {
+const emailErrorSetter = (emailValid, emailInput) => {
+  const emailValue = emailInput.value;
+
+  if (emailValue === '') {
+    emailInput.nextElementSibling.textContent = 'Email should not be empty';
+  } else {
+    emailInput.nextElementSibling.textContent =
+      'Email address must be formatted correctly';
+  }
+
   if (!emailValid) {
     emailInput.parentElement.classList.add('not-valid');
+    emailInput.classList.add('not-valid');
     emailInput.nextElementSibling.style.setProperty('display', 'block');
   } else {
     emailInput.parentElement.classList.remove('not-valid');
+    emailInput.classList.remove('not-valid');
+    emailInput.parentElement.classList.add('valid');
     emailInput.nextElementSibling.style.setProperty('display', 'none');
   }
 };
@@ -73,9 +84,6 @@ const emailErrorSetter = (emailValid, infoBox, emailInput) => {
  * @param ccInput {HTMLInputElement}
  */
 const ccErrorSetter = (ccValid, ccInput) => {
-  const numberRegex = /^\d*$/;
-  const inputValue = ccInput.value;
-
   if (!ccValid) {
     ccInput.parentElement.classList.add('not-valid');
     ccInput.classList.add('not-valid');
@@ -83,15 +91,8 @@ const ccErrorSetter = (ccValid, ccInput) => {
   } else {
     ccInput.parentElement.classList.remove('not-valid');
     ccInput.classList.remove('not-valid');
+    ccInput.parentElement.classList.add('valid');
     ccInput.nextElementSibling.style.setProperty('display', 'none');
-  }
-
-  if (!numberRegex.test(inputValue)) {
-    ccInput.nextElementSibling.textContent =
-      'Credit card number can only contain numbers...';
-  } else {
-    ccInput.nextElementSibling.textContent =
-      'Credit card number must be between 13 - 16 digits';
   }
 };
 
@@ -108,6 +109,7 @@ const zipErrorSetter = (zipValid, zipInput) => {
   } else {
     zipInput.parentElement.classList.remove('not-valid');
     zipInput.classList.remove('not-valid');
+    zipInput.parentElement.classList.add('valid');
     zipInput.nextElementSibling.style.setProperty('display', 'none');
   }
 };
@@ -125,6 +127,7 @@ const cvvErrorSetter = (cvvValid, cvvInput) => {
   } else {
     cvvInput.parentElement.classList.remove('not-valid');
     cvvInput.classList.remove('not-valid');
+    cvvInput.parentElement.classList.add('valid');
     cvvInput.nextElementSibling.style.setProperty('display', 'none');
   }
 };
@@ -142,6 +145,7 @@ const nameErrorSetter = (nameValid, nameInput) => {
   } else {
     nameInput.parentElement.classList.remove('not-valid');
     nameInput.classList.remove('not-valid');
+    nameInput.parentElement.classList.add('valid');
     nameInput.nextElementSibling.style.setProperty('display', 'none');
   }
 };
@@ -152,14 +156,16 @@ const nameErrorSetter = (nameValid, nameInput) => {
  * @param activitiesFieldSet {HTMLInputElement}
  */
 const activitiesErrorSetter = (activitiesValid, activitiesFieldSet) => {
+  // console.log('activitiesValid: ', activitiesValid);
+  // console.log('activitiesFieldSet: ', activitiesFieldSet);
+
   if (!activitiesValid) {
-    activitiesFieldSet.parentElement.classList.add('not-valid');
     activitiesFieldSet.classList.add('not-valid');
-    activitiesFieldSet.nextElementSibling.style.setProperty('display', 'block');
+    activitiesFieldSet.lastElementChild.style.setProperty('display', 'block');
   } else {
-    activitiesFieldSet.parentElement.classList.remove('not-valid');
     activitiesFieldSet.classList.remove('not-valid');
-    activitiesFieldSet.nextElementSibling.style.setProperty('display', 'none');
+    activitiesFieldSet.classList.add('valid');
+    activitiesFieldSet.lastElementChild.style.setProperty('display', 'none');
   }
 };
 
@@ -344,7 +350,6 @@ const main = () => {
 
   const emailInput = document.getElementById('email');
   const jobRoleInput = document.getElementById('title');
-  const basicInfoBox = document.querySelector('.basic-info');
   const otherJobRoleInput = document.getElementById('other-job-role');
   const creditCardBox = document.querySelector('.credit-card-box');
   const expirationBox = document.querySelector('.expiration-box');
@@ -411,29 +416,31 @@ const main = () => {
   );
 
   emailInput.addEventListener('keyup', (event) => {
-    const isEmailValid = emailValidator(event.target.value);
-    emailErrorSetter(isEmailValid, basicInfoBox, emailInput);
-  });
+    const emailValue = event.target.value;
+    const isEmailValid = emailValidator(emailValue);
 
-  creditCardBox.addEventListener('keyup', (event) => {
-    const { creditCardValid } = creditCardValidator();
-
-    ccErrorSetter(creditCardValid, event.target);
+    emailErrorSetter(isEmailValid, emailInput);
   });
 
   formContainer.addEventListener('submit', (event) => {
     const nameInputValue = nameInput.value;
-    const nameInputError = nameInputValue !== '';
 
-    nameErrorSetter(nameInputError, nameInput);
+    const nameInputValid =
+      nameInputValue !== '' || nameInputValue.trim() !== '';
 
-    const paymentMethodValue = paymentMethod.value;
+    nameErrorSetter(nameInputValid, nameInput);
 
     const isEmailValid = emailValidator(emailInput.value);
-    emailErrorSetter(isEmailValid, basicInfoBox, emailInput);
+    emailErrorSetter(isEmailValid, emailInput);
 
     const isOneActivityChecked = activitiesValidator(activitiesBox.children);
     activitiesErrorSetter(isOneActivityChecked, activitiesFieldset);
+
+    if (!nameInputValue || !isEmailValid || !isOneActivityChecked) {
+      event.preventDefault();
+    }
+
+    const paymentMethodValue = paymentMethod.value;
 
     if (paymentMethodValue === 'credit-card') {
       const { creditCardValid, cvvValid, zipCodeValid } = creditCardValidator();
@@ -446,11 +453,9 @@ const main = () => {
       zipErrorSetter(zipCodeValid, zipInputElement);
       cvvErrorSetter(cvvValid, cvvInputElement);
 
-      event.preventDefault();
-    }
-
-    if (nameInputError || isEmailValid || isOneActivityChecked) {
-      event.preventDefault();
+      if (!creditCardValid || !zipCodeValid || !cvvInputElement) {
+        event.preventDefault();
+      }
     }
   });
 };
